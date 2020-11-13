@@ -24,3 +24,12 @@ float ek_sasum(const size_t n, const float *x, const size_t inc_x) {
     }
     return result;
 }
+
+// constant times a vector plus a vector
+void ek_saxpy(const size_t n, const float alpha, const float *x, const size_t inc_x, float *y, const size_t inc_y) {
+    size_t i;
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        y[i * inc_y] = alpha * x[i * inc_x] + y[i * inc_y];
+    }
+}
