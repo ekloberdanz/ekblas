@@ -15,16 +15,25 @@ int compare_doubles(double a, double b) {
 }
 
 int main () {
-    float array_1[] = {1.0, 2.0, 3.0, 4.0};
-    float array_2[] = {10.0, 20.0, 30.0, 40.0};
+    float array_1[] = {1.0, 2.0, 3.0, -4.0};
+    float array_2[] = {10.0, -20.0, 30.0, 40.0};
     float control;
     float result;
 
     control = cblas_sdot(4, array_1, 1, array_2, 1);
-    printf("Result %f\n", control);
-
     result = ek_sdot(4, array_1, 1, array_2, 1);
+    printf("control: %f, result: %f\n", control, result);
+    assert(compare_floats(control, result));
 
+
+    control = cblas_sdot(4, array_1, 0, array_2, 1);
+    result = ek_sdot(4, array_1, 0, array_2, 1);
+    printf("control: %f, result: %f\n", control, result);
+    assert(compare_floats(control, result));
+
+    control = cblas_sasum(4, array_1, 1);
+    result = ek_sasum(4, array_1, 1);
+    printf("control: %f, result: %f\n", control, result);
     assert(compare_floats(control, result));
 
     puts("TESTS PASSED");

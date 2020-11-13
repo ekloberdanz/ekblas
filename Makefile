@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=gnu89 -fopenmp -lm
+CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm
 LDFLAGS=-lopenblas
 
 test: test.o ekblas.o
 	$(CC) -o test test.o ekblas.o $(CFLAGS) $(LDFLAGS)
 
-test.o: test.c
+test.o: test.c ekblas.h
 	$(CC) -o test.o -c test.c $(CFLAGS)
 
 ekblas.o: ekblas.h ekblas.c
