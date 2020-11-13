@@ -55,6 +55,11 @@ int main () {
     ek_saxpy(4, 2.3, array_1, 1, result_array, 1);
     assert(compare_arrays_floats(control_array, result_array, 4));
 
+    control = cblas_snrm2(4, array_1, 1);
+    result = ek_snrm2(4, array_1, 1);
+    printf("control: %f, result: %f\n", control, result);
+    assert(compare_floats(control, result));
+
     puts("TESTS PASSED");
     return 0;
 }

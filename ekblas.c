@@ -33,3 +33,14 @@ void ek_saxpy(const size_t n, const float alpha, const float *x, const size_t in
         y[i * inc_y] = alpha * x[i * inc_x] + y[i * inc_y];
     }
 }
+
+// euclidean norm of a vector
+float ek_snrm2(const size_t n, const float *x, const size_t inc_x) {
+    size_t i;
+    float result = 0.0;
+    #pragma omp parallel for reduction(+:result)
+    for (i = 0; i < n; i++) {
+        result += x[i * inc_x] * x[i * inc_x];
+    }
+    return sqrt(result);
+}
