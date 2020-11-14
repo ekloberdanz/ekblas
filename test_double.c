@@ -41,6 +41,8 @@ int main () {
     const double array_2[] = {10.0, -20.0, 30.0, 40.0};
     const float array_1_single[] = {1.0, 2.0, 3.0, -4.0};
     const float array_2_single[] = {10.0, -20.0, 30.0, 40.0};
+    double tmp1[] = {0.0, 0.0, 0.0, 0.0};
+    double tmp2[] = {0.0, 0.0, 0.0, 0.0};
     double control_array[] = {0.0, 0.0, 0.0, 0.0};
     double result_array[] = {0.0, 0.0, 0.0, 0.0};
     double control;
@@ -95,6 +97,15 @@ int main () {
     cblas_dcopy(4, array_1, 1, control_array, 1);
     ek_dcopy(4, array_1, 1, result_array, 1);
     assert(compare_arrays_doubles(control_array, result_array, 4));
+
+    memcpy(result_array, array_1, sizeof(array_1));
+    memcpy(control_array, array_2, sizeof(array_2));
+    memcpy(tmp1, array_1, sizeof(array_1));
+    memcpy(tmp2, array_2, sizeof(array_2));
+    cblas_drot(4, result_array, 1, control_array, 1, 1.2, 1.3);
+    ek_drot(4, tmp1, 1, tmp2, 1, 1.2, 1.3);
+    assert(compare_arrays_doubles(tmp1, result_array, 4));
+    assert(compare_arrays_doubles(tmp2, control_array, 4));
 
     puts("TESTS PASSED");
     return 0;

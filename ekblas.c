@@ -189,6 +189,17 @@ void ek_dcopy(const size_t n, const double *x, const size_t inc_x, double *y, co
     }
 }
 
+// applies a plane rotation
+void ek_drot(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y, const double c, const double s) {
+    size_t i;
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        double tmp = x[i * inc_x];
+        x[i * inc_x] = c * x[i * inc_x] + s * y[i * inc_y];
+        y[i * inc_y] = c * y[i * inc_y] - s * tmp;
+    }
+}
+
 
 
 // // performs one of the matrix-vector operations
