@@ -45,6 +45,11 @@ int main () {
     float control;
     float result;
 
+    control = cblas_sdsdot(4, 2.3, array_1, 1, array_2, 1);
+    result = ek_sdsdot(4, 2.3, array_1, 1, array_2, 1);
+    printf("control: %f, result: %f\n", control, result);
+    assert(compare_floats(control, result));
+
     control = cblas_sdot(4, array_1, 1, array_2, 1);
     result = ek_sdot(4, array_1, 1, array_2, 1);
     printf("control: %f, result: %f\n", control, result);

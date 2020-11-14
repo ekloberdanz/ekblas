@@ -5,6 +5,20 @@
 
 // Level 1 - single precision
 
+// inner product of two vectors with extended precision accumulation
+float ek_sdsdot(const size_t n, const float alpha, const float *x, const size_t inc_x, const float *y, const size_t inc_y) {
+    size_t i;
+    double acc = 0.0;
+    float result = 0.0;
+    #pragma omp parallel for reduction(+:acc)
+    for (i = 0; i < n; i++) {
+        acc += x[i * inc_x] * y[i * inc_y];
+    }
+    result = acc;
+    result += alpha;
+    return result;
+}
+
 // vector dot product
 float ek_sdot(const size_t n, const float *x, const size_t inc_x, const float *y, const size_t inc_y) {
     size_t i;
@@ -78,6 +92,20 @@ void ek_scopy(const size_t n, const float *x, const size_t inc_x, float *y, cons
 
 
 // Level 1 - double precision
+
+// inner product of two vectors with extended precision accumulation
+double ek_dsdot(const size_t n, const float *x, const size_t inc_x, const float *y, const size_t inc_y) {
+    size_t i;
+    double acc = 0.0;
+    float result = 0.0;
+    #pragma omp parallel for reduction(+:acc)
+    for (i = 0; i < n; i++) {
+        acc += x[i * inc_x] * y[i * inc_y];
+    }
+    result = acc;
+    return result;
+}
+
 // vector dot product
 double ek_ddot(const size_t n, const double *x, const size_t inc_x, const double *y, const size_t inc_y) {
     size_t i;

@@ -44,6 +44,11 @@ int main () {
     double control;
     double result;
 
+    control = cblas_dsdot(4, array_1, 1, array_2, 1);
+    result = ek_dsdot(4, array_1, 1, array_2, 1);
+    printf("control: %f, result: %f\n", control, result);
+    assert(compare_floats(control, result));
+
     control = cblas_ddot(4, array_1, 1, array_2, 1);
     result = ek_ddot(4, array_1, 1, array_2, 1);
     printf("control: %f, result: %f\n", control, result);
