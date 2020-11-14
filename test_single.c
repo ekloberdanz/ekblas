@@ -35,6 +35,14 @@ int compare_arrays_doubles(const double a[], const double b [], size_t n) {
     return 1;
 }
 
+void print_array_single(const float a[], size_t n) {
+    size_t i;
+    for (i = 0; i < n; i++) {
+        printf("%f, ", a[i]);
+    }
+}
+
+
 int main () {
 
     // single precision
@@ -42,6 +50,8 @@ int main () {
     const float array_2[] = {10.0, -20.0, 30.0, 40.0};
     float control_array[] = {0.0, 0.0, 0.0, 0.0};
     float result_array[] = {0.0, 0.0, 0.0, 0.0};
+    float tmp1[] = {0.0, 0.0, 0.0, 0.0};
+    float tmp2[] = {0.0, 0.0, 0.0, 0.0};
     float control;
     float result;
 
@@ -94,6 +104,15 @@ int main () {
     cblas_scopy(4, array_1, 1, control_array, 1);
     ek_scopy(4, array_1, 1, result_array, 1);
     assert(compare_arrays_floats(control_array, result_array, 4));
+
+    memcpy(result_array, array_1, sizeof(array_1));
+    memcpy(control_array, array_2, sizeof(array_2));
+    memcpy(tmp1, array_1, sizeof(array_1));
+    memcpy(tmp2, array_2, sizeof(array_2));
+    cblas_srot(4, result_array, 1, control_array, 1, 1.2, 1.3);
+    ek_srot(4, tmp1, 1, tmp2, 1, 1.2, 1.3);
+    assert(compare_arrays_floats(tmp1, result_array, 4));
+    assert(compare_arrays_floats(tmp2, control_array, 4));
 
     puts("TESTS PASSED");
     return 0;

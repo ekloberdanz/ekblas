@@ -90,6 +90,18 @@ void ek_scopy(const size_t n, const float *x, const size_t inc_x, float *y, cons
     }
 }
 
+// applies a plane rotation
+void ek_srot(const size_t n, float *x, const size_t inc_x, float *y, const size_t inc_y, const float c, const float s) {
+    size_t i;
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        float tmp = x[i * inc_x];
+        x[i * inc_x] = c * x[i * inc_x] + s * y[i * inc_y];
+        y[i * inc_y] = c * y[i * inc_y] - s * tmp;
+    }
+}
+
+
 
 // Level 1 - double precision
 
