@@ -101,7 +101,64 @@ void ek_srot(const size_t n, float *x, const size_t inc_x, float *y, const size_
     }
 }
 
+static float signs(float a, float b) {
+    if (b < 0) {
+        return -fabsf(a);
+    }
+    else {
+        return fabsf(a);
+    }
+}
 
+// computes the parameters for a Givens rotation
+void ek_srotg(float *a, float *b, float *c, float *s) {
+    /*
+    float r = sqrtf(*a * *a + *b * *b);
+    float z;
+    *c = *a/r;
+    *s = -*b/r;
+    if (fabsf(*a) > fabsf(*b)) {
+        z = *s;
+    }
+    else if (*c != 0) {
+        z = 1.0/(*c);
+    }    
+    else {
+        z = 1.0;
+    }
+    *a = r;
+    *b = z;
+    */
+
+    float h, d, z, r;
+
+    if (*b != 0.0) {
+        h = sqrtf(*a * *a + *b * *b);
+        d = 1.0 / h;
+        *c = fabsf(*a) * d;
+        *s = signs(d, *a) * *b;
+        r = signs(1.0, *a) * h;
+    }
+    else {
+        *c = 1.0;
+        *s = 0.0;
+        r = *a;
+    }
+
+    *a = r;
+
+    if (fabsf(*a) > fabsf(*b)) {
+        z = *s;
+    }
+    else if (*c != 0.0) {
+        z = 1.0/(*c);
+    }    
+    else {
+        z = 1.0;
+    }
+
+    *b = z;
+}
 
 // Level 1 - double precision
 

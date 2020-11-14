@@ -114,6 +114,16 @@ int main () {
     assert(compare_arrays_floats(tmp1, result_array, 4));
     assert(compare_arrays_floats(tmp2, control_array, 4));
 
+    float a1, a2, b1, b2, c1, c2, s1, s2;
+    a1 = a2 = 15.7;
+    b1 = b2 = 4.4;
+    cblas_srotg(&a1, &b1, &c1, &s1); 
+    ek_srotg(&a2, &b2, &c2, &s2);
+    assert(compare_floats(a1, a2));
+    assert(compare_floats(b1, b2));
+    assert(compare_floats(c1, c2));
+    assert(compare_floats(s1, s2));
+
     puts("TESTS PASSED");
     return 0;
 }
