@@ -1,2 +1,3 @@
-test
+test_single
+test_double
 *.o
