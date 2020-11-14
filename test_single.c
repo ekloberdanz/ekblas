@@ -52,6 +52,7 @@ int main () {
     float result_array[] = {0.0, 0.0, 0.0, 0.0};
     float tmp1[] = {0.0, 0.0, 0.0, 0.0};
     float tmp2[] = {0.0, 0.0, 0.0, 0.0};
+    const float param[] = {1.0, 2.0, 3.0, -4.0, 0.3};
     float control;
     float result;
 
@@ -123,6 +124,15 @@ int main () {
     assert(compare_floats(b1, b2));
     assert(compare_floats(c1, c2));
     assert(compare_floats(s1, s2));
+
+    memcpy(result_array, array_1, sizeof(array_1));
+    memcpy(control_array, array_2, sizeof(array_2));
+    memcpy(tmp1, array_1, sizeof(array_1));
+    memcpy(tmp2, array_2, sizeof(array_2));
+    cblas_srotm(4, result_array, 1, control_array, 1, param);
+    ek_srotm(4, tmp1, 1, tmp2, 1, param);
+    assert(compare_arrays_floats(tmp1, result_array, 4));
+    assert(compare_arrays_floats(tmp2, control_array, 4));
 
     puts("TESTS PASSED");
     return 0;

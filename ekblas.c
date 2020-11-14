@@ -90,7 +90,7 @@ void ek_scopy(const size_t n, const float *x, const size_t inc_x, float *y, cons
     }
 }
 
-// applies a plane rotation
+// performs rotation of points in the plane
 void ek_srot(const size_t n, float *x, const size_t inc_x, float *y, const size_t inc_y, const float c, const float s) {
     size_t i;
     #pragma omp parallel for
@@ -158,6 +158,44 @@ void ek_srotg(float *a, float *b, float *c, float *s) {
     *a = r;
     *b = z;
 }
+
+// performs modified Givens rotation of points in the plane
+void ek_srotm(const size_t n, float *x, const size_t inc_x, float *y, const size_t inc_y, const float *param) {
+    size_t i;
+    float flag = param[0];
+    float H[4];
+    if (flag == -1.0) {
+        H[0] = param[1];
+        H[1] = param[3];
+        H[2] = param[2];
+        H[3] = param[4];
+    }
+    if (flag == 0.0) {
+        H[0] = 1.0;
+        H[1] = param[2];
+        H[2] = param[3];
+        H[3] = 1.0;
+    }
+    if (flag == 1.0) {
+        H[0] = param[1];
+        H[1] = 1.0;
+        H[2] = -1.0;
+        H[3] = param[4];
+    }
+    if (flag == -2.0) {
+        H[0] = 1.0;
+        H[1] = 0.0;
+        H[2] = 0.0;
+        H[3] = 1.0;
+    }
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        float tmp = x[i * inc_x];
+        x[i * inc_x] = H[0] * x[i * inc_x] + H[1] * y[i * inc_y];
+        y[i * inc_y] = H[2] * tmp + H[3] * y[i * inc_y];
+    }
+}
+
 
 // Level 1 - double precision
 
