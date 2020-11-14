@@ -25,5 +25,6 @@ void ek_dscal(const size_t n, const double alpha, double *x, const size_t inc_x)
 void ek_dswap(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y);
 void ek_dcopy(const size_t n, const double *x, const size_t inc_x, double *y, const size_t inc_y);
 void ek_drot(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y, const double c, const double s);
+void ek_drotm(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y, const double *param);
 
 #endif /* EKBLAS_H */

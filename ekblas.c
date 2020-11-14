@@ -294,7 +294,42 @@ void ek_drot(const size_t n, double *x, const size_t inc_x, double *y, const siz
     }
 }
 
-
+// performs modified Givens rotation of points in the plane
+void ek_drotm(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y, const double *param) {
+    size_t i;
+    double flag = param[0];
+    double H[4];
+    if (flag == -1.0) {
+        H[0] = param[1];
+        H[1] = param[3];
+        H[2] = param[2];
+        H[3] = param[4];
+    }
+    if (flag == 0.0) {
+        H[0] = 1.0;
+        H[1] = param[2];
+        H[2] = param[3];
+        H[3] = 1.0;
+    }
+    if (flag == 1.0) {
+        H[0] = param[1];
+        H[1] = 1.0;
+        H[2] = -1.0;
+        H[3] = param[4];
+    }
+    if (flag == -2.0) {
+        H[0] = 1.0;
+        H[1] = 0.0;
+        H[2] = 0.0;
+        H[3] = 1.0;
+    }
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        double tmp = x[i * inc_x];
+        x[i * inc_x] = H[0] * x[i * inc_x] + H[1] * y[i * inc_y];
+        y[i * inc_y] = H[2] * tmp + H[3] * y[i * inc_y];
+    }
+}
 
 // // performs one of the matrix-vector operations
 // void ek_sgbmv(const CBLAS_LAYOUT layout, const CBLAS_TRANSPOSE TransA, const int M, const int N, const int KL, const int KU, const float alpha, const float *A, const int lda, const float *X, const int incX, const float beta, float *Y, const int incY) {

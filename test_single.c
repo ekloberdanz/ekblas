@@ -52,7 +52,7 @@ int main () {
     float result_array[] = {0.0, 0.0, 0.0, 0.0};
     float tmp1[] = {0.0, 0.0, 0.0, 0.0};
     float tmp2[] = {0.0, 0.0, 0.0, 0.0};
-    const float param[] = {1.0, 2.0, 3.0, -4.0, 0.3};
+    const float param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
     float control;
     float result;
 
