@@ -60,6 +60,12 @@ int main () {
     printf("control: %f, result: %f\n", control, result);
     assert(compare_floats(control, result));
 
+    memcpy(result_array, array_2, sizeof(array_2));
+    memcpy(control_array, array_2, sizeof(array_2));
+    cblas_sscal(4, 2.3, control_array, 1);
+    ek_sscal(4, 2.3, result_array, 1);
+    assert(compare_arrays_floats(control_array, result_array, 4));
+
     puts("TESTS PASSED");
     return 0;
 }

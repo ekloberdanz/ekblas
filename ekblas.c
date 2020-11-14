@@ -34,7 +34,7 @@ void ek_saxpy(const size_t n, const float alpha, const float *x, const size_t in
     }
 }
 
-// euclidean norm of a vector
+// euclidean norm (L2 norm) of a vector
 float ek_snrm2(const size_t n, const float *x, const size_t inc_x) {
     size_t i;
     float result = 0.0;
@@ -43,4 +43,13 @@ float ek_snrm2(const size_t n, const float *x, const size_t inc_x) {
         result += x[i * inc_x] * x[i * inc_x];
     }
     return sqrt(result);
+}
+
+// scales a vector by a constant
+void ek_sscal(const size_t n, const float alpha, float *x, const size_t inc_x) {
+    size_t i;
+    #pragma omp parallel for
+    for (i = 0; i < n; i++) {
+        x[i * inc_x] = alpha * x[i * inc_x];
+    }
 }
