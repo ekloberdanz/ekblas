@@ -145,8 +145,6 @@ void ek_srotg(float *a, float *b, float *c, float *s) {
         r = *a;
     }
 
-    *a = r;
-
     if (fabsf(*a) > fabsf(*b)) {
         z = *s;
     }
@@ -157,6 +155,7 @@ void ek_srotg(float *a, float *b, float *c, float *s) {
         z = 1.0;
     }
 
+    *a = r;
     *b = z;
 }
 
