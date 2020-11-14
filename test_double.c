@@ -39,13 +39,15 @@ int main () {
     // double precision
     const double array_1[] = {1.0, 2.0, 3.0, -4.0};
     const double array_2[] = {10.0, -20.0, 30.0, 40.0};
+    const float array_1_single[] = {1.0, 2.0, 3.0, -4.0};
+    const float array_2_single[] = {10.0, -20.0, 30.0, 40.0};
     double control_array[] = {0.0, 0.0, 0.0, 0.0};
     double result_array[] = {0.0, 0.0, 0.0, 0.0};
     double control;
     double result;
 
-    control = cblas_dsdot(4, array_1, 1, array_2, 1);
-    result = ek_dsdot(4, array_1, 1, array_2, 1);
+    control = cblas_dsdot(4, array_1_single, 1, array_2_single, 1);
+    result = ek_dsdot(4, array_1_single, 1, array_2_single, 1);
     printf("control: %f, result: %f\n", control, result);
     assert(compare_floats(control, result));
 
