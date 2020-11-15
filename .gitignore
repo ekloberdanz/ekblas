@@ -1,3 +1,6 @@
 test_single
 test_double
 *.o
+*.ods#
+benchmark_double
+benchmark_single

@@ -1,4 +1,7 @@
 CC=gcc
+# Compile without openmp
+#CFLAGS=-Wall -Wextra -std=gnu99 -lm -Ofast -march=native -mtune=native
+# Compile with openmp
 CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm -Ofast -march=native -mtune=native
 LDFLAGS=-lopenblas
 
