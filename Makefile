@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm
+CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm -Ofast -march=native -mtune=native
 LDFLAGS=-lopenblas
 
 .PHONY: all
