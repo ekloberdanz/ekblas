@@ -67,6 +67,8 @@ int main () {
     // allocate memory for large arrays for benchmarking code to cblas
     double *array_1 = malloc(sizeof(double) * SIZE);
     double *array_2 = malloc(sizeof(double) * SIZE);
+    float *array_1_single = malloc(sizeof(float) * SIZE);
+    float *array_2_single = malloc(sizeof(float) * SIZE);
     double *control_array = malloc(sizeof(double) * SIZE);
     double *result_array = malloc(sizeof(double) * SIZE);
     double *tmp1 = malloc(sizeof(double) * SIZE);
@@ -118,14 +120,14 @@ int main () {
 
     // benchmark each routine implementation to cblas
     t_start = clock();
-    *control = cblas_ddot(SIZE, array_1, 1, array_2, 1);
+    *control = cblas_dsdot(SIZE, array_1_single, 1, array_2_single, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "ddot");
+    fprintf(fp, "%s", "dsdot");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    *result = ek_ddot(SIZE, array_1, 1, array_2, 1);
+    *result = ek_dsdot(SIZE, array_1_single, 1, array_2_single, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
