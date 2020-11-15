@@ -2,5 +2,6 @@ test_single
 test_double
 *.o
 *.ods#
+.vscode
 benchmark_double
 benchmark_single
