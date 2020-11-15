@@ -5,6 +5,7 @@
 
 #include "ekblas.h"
 
+
 int compare_floats(float a, float b) {
     const float epsilon = 0.001;
     return fabsf(a - b) <= epsilon * fabsf(a);

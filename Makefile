@@ -3,7 +3,13 @@ CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm
 LDFLAGS=-lopenblas
 
 .PHONY: all
-all: test_single test_double
+all: test_single test_double benchmark_single
+
+benchmark_single: benchmark_single.o ekblas.o
+	$(CC) -o benchmark_single benchmark_single.o ekblas.o $(CFLAGS) $(LDFLAGS)
+
+benchmark_single.o: benchmark_single.c ekblas.h
+	$(CC) -o benchmark_single.o -c benchmark_single.c $(CFLAGS)
 
 test_single: test_single.o ekblas.o
 	$(CC) -o test_single test_single.o ekblas.o $(CFLAGS) $(LDFLAGS)
