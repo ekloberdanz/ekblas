@@ -59,7 +59,10 @@ void print_matrix(const float *mat, size_t n, size_t m) {
 int main () {
 
     // single precision
-    const size_t SIZE = 1000000;
+    const size_t SIZE = 100000;
+    const size_t M = 1000;
+    const size_t N = 5000;
+    const size_t K = 1000;
 
     // allocate memory for large arrays for benchmarking code to cblas
     float *array_1 = malloc(sizeof(float) * SIZE);
@@ -71,6 +74,11 @@ int main () {
     const float param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
     float *control = malloc(sizeof(float) * SIZE);
     float *result = malloc(sizeof(float) * SIZE);
+    float *A = malloc(sizeof(float) * (M * K));
+    float *B = malloc(sizeof(float) * (K * N));
+    float *C1 = malloc(sizeof(float) * (M * N));
+    float *C2 = malloc(sizeof(float) * (M * N));
+
 
     // fill arrays with values
     size_t i;
@@ -82,6 +90,22 @@ int main () {
         result_array[i] = 0;
         tmp1[i] = 0;
         tmp2[i] = 0;
+    }
+
+    #pragma omp parallel for
+    for (i = 0; i < (M * K); i++) {
+        A[i] = rand();
+    }
+
+    #pragma omp parallel for
+    for (i = 0; i < (K * N); i++) {
+        B[i] = rand();
+    }
+
+    #pragma omp parallel for
+    for (i = 0; i < (M * N); i++) {
+        C1[i] = 0;
+        C2[i] = 0;
     }
 
     // declare variables for timing routines
@@ -272,30 +296,9 @@ int main () {
     fprintf(fp, ",%f\n", t_delta);
 
 
-    float A[] = {
-        1.0, 2.0, 3.0,
-        4.0, 5.0, 6.0
-    };
-
-    float B[] = {
-        7.0, 8.0,
-        9.0, 10.0,
-        11.0, 12.0
-    };
-
-    float C1[] = {
-        0.0, 0.0,
-        0.0, 0.0
-    };
-
-    float C2[] = {
-        0.0, 0.0,
-        0.0, 0.0
-    };
-
-    size_t m = 2;
-    size_t n = 2;
-    size_t k = 3;
+    size_t m = M; // rows in A and C
+    size_t n = N; // columns in B and C
+    size_t k = K; // rows in B and columns in A
 
     float alpha = 1.0;
     float beta = 0.0;
@@ -328,6 +331,10 @@ int main () {
     free(tmp2);
     free(result);
     free(control);
+    free(A);
+    free(B);
+    free(C1);
+    free(C2);
 
     return 0;
 }
