@@ -44,7 +44,7 @@ void print_array_single(const float a[], size_t n) {
     }
 }
 
-void print_matrix(const float *mat, size_t n, size_t m) {
+void print_matrix(const double *mat, size_t n, size_t m) {
     size_t i;
 
     for (i = 0; i < (n * m); i++) {
@@ -65,19 +65,19 @@ int main () {
     const size_t K = 1000;
 
     // allocate memory for large arrays for benchmarking code to cblas
-    float *array_1 = malloc(sizeof(float) * SIZE);
-    float *array_2 = malloc(sizeof(float) * SIZE);
-    float *control_array = malloc(sizeof(float) * SIZE);
-    float *result_array = malloc(sizeof(float) * SIZE);
-    float *tmp1 = malloc(sizeof(float) * SIZE);
-    float *tmp2 = malloc(sizeof(float) * SIZE);
-    const float param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
-    float *control = malloc(sizeof(float) * SIZE);
-    float *result = malloc(sizeof(float) * SIZE);
-    float *A = malloc(sizeof(float) * (M * K));
-    float *B = malloc(sizeof(float) * (K * N));
-    float *C1 = malloc(sizeof(float) * (M * N));
-    float *C2 = malloc(sizeof(float) * (M * N));
+    double *array_1 = malloc(sizeof(double) * SIZE);
+    double *array_2 = malloc(sizeof(double) * SIZE);
+    double *control_array = malloc(sizeof(double) * SIZE);
+    double *result_array = malloc(sizeof(double) * SIZE);
+    double *tmp1 = malloc(sizeof(double) * SIZE);
+    double *tmp2 = malloc(sizeof(double) * SIZE);
+    const double param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
+    double *control = malloc(sizeof(double) * SIZE);
+    double *result = malloc(sizeof(double) * SIZE);
+    double *A = malloc(sizeof(double) * (M * K));
+    double *B = malloc(sizeof(double) * (K * N));
+    double *C1 = malloc(sizeof(double) * (M * N));
+    double *C2 = malloc(sizeof(double) * (M * N));
 
 
     // fill arrays with values
@@ -114,76 +114,46 @@ int main () {
 
     // open file to write results to
     FILE *fp;
-    fp = fopen("results_single.csv", "w");
+    fp = fopen("results_double.csv", "w");
 
     // benchmark each routine implementation to cblas
     t_start = clock();
-    *control = cblas_sdsdot(SIZE, 2.3, array_1, 1, array_2, 1);
+    *control = cblas_ddot(SIZE, array_1, 1, array_2, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sdsdot");
+    fprintf(fp, "%s", "ddot");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    *result = ek_sdsdot(SIZE, 2.3, array_1, 1, array_2, 1);
+    *result = ek_ddot(SIZE, array_1, 1, array_2, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
     fprintf(fp, ",%f\n", t_delta);
     
     t_start = clock();
-    *control = cblas_sdot(SIZE, array_1, 1, array_2, 1);
+    *control = cblas_ddot(SIZE, array_1, 1, array_2, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sdot");
+    fprintf(fp, "%s", "ddot");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    *result = ek_sdot(SIZE, array_1, 1, array_2, 1);
+    *result = ek_ddot(SIZE, array_1, 1, array_2, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
     fprintf(fp, ",%f\n", t_delta);
 
     t_start = clock();
-    *control = cblas_sasum(SIZE, array_1, 1);
+    *control = cblas_dasum(SIZE, array_1, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sasum");
+    fprintf(fp, "%s", "dasum");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    *result = ek_sasum(SIZE, array_1, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
-
-    memcpy(result_array, array_2, sizeof(*array_2));
-    memcpy(control_array, array_2, sizeof(*array_2));
-    t_start = clock();
-    cblas_saxpy(SIZE, 2.3, array_1, 1, control_array, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "saxpy");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_saxpy(SIZE, 2.3, array_1, 1, result_array, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
-
-    t_start = clock();
-    *control = cblas_snrm2(SIZE, array_1, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "snrm2");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    *result = ek_snrm2(SIZE, array_1, 1);
+    *result = ek_dasum(SIZE, array_1, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
@@ -192,14 +162,44 @@ int main () {
     memcpy(result_array, array_2, sizeof(*array_2));
     memcpy(control_array, array_2, sizeof(*array_2));
     t_start = clock();
-    cblas_sscal(SIZE, 2.3, control_array, 1);
+    cblas_daxpy(SIZE, 2.3, array_1, 1, control_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sscal");
+    fprintf(fp, "%s", "daxpy");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    ek_sscal(SIZE, 2.3, result_array, 1);
+    ek_daxpy(SIZE, 2.3, array_1, 1, result_array, 1);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time result: %f\n", t_delta);
+    fprintf(fp, ",%f\n", t_delta);
+
+    t_start = clock();
+    *control = cblas_dnrm2(SIZE, array_1, 1);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time control: %f\n", t_delta);
+    fprintf(fp, "%s", "dnrm2");
+    fprintf(fp, ",%f", t_delta);
+    t_start = clock();
+    *result = ek_dnrm2(SIZE, array_1, 1);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time result: %f\n", t_delta);
+    fprintf(fp, ",%f\n", t_delta);
+
+    memcpy(result_array, array_2, sizeof(*array_2));
+    memcpy(control_array, array_2, sizeof(*array_2));
+    t_start = clock();
+    cblas_dscal(SIZE, 2.3, control_array, 1);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time control: %f\n", t_delta);
+    fprintf(fp, "%s", "dscal");
+    fprintf(fp, ",%f", t_delta);
+    t_start = clock();
+    ek_dscal(SIZE, 2.3, result_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
@@ -209,14 +209,14 @@ int main () {
     memcpy(result_array, array_1, sizeof(*array_1));
     memcpy(control_array, array_2, sizeof(*array_2));
     t_start = clock();
-    cblas_sswap(SIZE, control_array, 1, result_array, 1);
+    cblas_dswap(SIZE, control_array, 1, result_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sswap");
+    fprintf(fp, "%s", "dswap");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    ek_sswap(SIZE, control_array, 1, result_array, 1);
+    ek_dswap(SIZE, control_array, 1, result_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
@@ -226,70 +226,70 @@ int main () {
     memcpy(result_array, array_2, sizeof(*array_2));
     memcpy(control_array, array_2, sizeof(*array_2));
     t_start = clock();
-    cblas_scopy(SIZE, array_1, 1, control_array, 1);
+    cblas_dcopy(SIZE, array_1, 1, control_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "scopy");
+    fprintf(fp, "%s", "dcopy");
     fprintf(fp, ",%f", t_delta);
     t_start = clock();
-    ek_scopy(SIZE, array_1, 1, result_array, 1);
+    ek_dcopy(SIZE, array_1, 1, result_array, 1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
     fprintf(fp, ",%f\n", t_delta);
-
-    memcpy(result_array, array_1, sizeof(*array_1));
-    memcpy(control_array, array_2, sizeof(*array_2));
-    memcpy(tmp1, array_1, sizeof(*array_1));
-    memcpy(tmp2, array_2, sizeof(*array_2));
-    t_start = clock();
-    cblas_srot(SIZE, result_array, 1, control_array, 1, 1.2, 1.3);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "srot");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_srot(SIZE, tmp1, 1, tmp2, 1, 1.2, 1.3);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
-
-
-    float a1, a2, b1, b2, c1, c2, s1, s2;
-    a1 = a2 = 15.7;
-    b1 = b2 = 4.4;
-
-    t_start = clock();
-    cblas_srotg(&a1, &b1, &c1, &s1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "srotg");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock(); 
-    ek_srotg(&a2, &b2, &c2, &s2);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
-
 
     memcpy(result_array, array_1, sizeof(*array_1));
     memcpy(control_array, array_2, sizeof(*array_2));
     memcpy(tmp1, array_1, sizeof(*array_1));
     memcpy(tmp2, array_2, sizeof(*array_2));
     t_start = clock();
-    cblas_srotm(SIZE, result_array, 1, control_array, 1, param);
+    cblas_drot(SIZE, result_array, 1, control_array, 1, 1.2, 1.3);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "srotm");
+    fprintf(fp, "%s", "drot");
+    fprintf(fp, ",%f", t_delta);
+    t_start = clock();
+    ek_drot(SIZE, tmp1, 1, tmp2, 1, 1.2, 1.3);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time result: %f\n", t_delta);
+    fprintf(fp, ",%f\n", t_delta);
+
+
+    // double a1, a2, b1, b2, c1, c2, s1, s2;
+    // a1 = a2 = 15.7;
+    // b1 = b2 = 4.4;
+
+    // t_start = clock();
+    // cblas_drotg(&a1, &b1, &c1, &s1);
+    // t_end = clock() - t_start;
+    // t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    // printf("time control: %f\n", t_delta);
+    // fprintf(fp, "%s", "drotg");
+    // fprintf(fp, ",%f", t_delta);
+    // t_start = clock(); 
+    // ek_drotg(&a2, &b2, &c2, &s2);
+    // t_end = clock() - t_start;
+    // t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    // printf("time result: %f\n", t_delta);
+    // fprintf(fp, ",%f\n", t_delta);
+
+
+    memcpy(result_array, array_1, sizeof(*array_1));
+    memcpy(control_array, array_2, sizeof(*array_2));
+    memcpy(tmp1, array_1, sizeof(*array_1));
+    memcpy(tmp2, array_2, sizeof(*array_2));
+    t_start = clock();
+    cblas_drotm(SIZE, result_array, 1, control_array, 1, param);
+    t_end = clock() - t_start;
+    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
+    printf("time control: %f\n", t_delta);
+    fprintf(fp, "%s", "drotm");
     fprintf(fp, ",%f", t_delta);
     t_start = clock(); 
-    ek_srotm(SIZE, tmp1, 1, tmp2, 1, param);
+    ek_drotm(SIZE, tmp1, 1, tmp2, 1, param);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
@@ -300,18 +300,18 @@ int main () {
     size_t n = N; // columns in B and C
     size_t k = K; // rows in B and columns in A
 
-    float alpha = 1.0;
-    float beta = 0.0;
+    double alpha = 1.0;
+    double beta = 0.0;
 
     t_start = clock();
-    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C2, n);
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C2, n);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time control: %f\n", t_delta);
-    fprintf(fp, "%s", "sgemm");
+    fprintf(fp, "%s", "dgemm");
     fprintf(fp, ",%f", t_delta);
     t_start = clock(); 
-    ek_sgemm(m, n, k, alpha, A, B, beta, C1);
+    ek_dgemm(m, n, k, alpha, A, B, beta, C1);
     t_end = clock() - t_start;
     t_delta = ((double)t_end)/CLOCKS_PER_SEC;
     printf("time result: %f\n", t_delta);
