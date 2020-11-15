@@ -42,6 +42,17 @@ void print_array_single(const float a[], size_t n) {
     }
 }
 
+void print_matrix(const float *mat, size_t n, size_t m) {
+    size_t i;
+
+    for (i = 0; i < (n * m); i++) {
+        if (((i + 1) % m) == 0) {
+            printf("%f\n", mat[i]);
+        } else {
+            printf("%f ", mat[i]);
+        }
+    }
+}
 
 int main () {
 
@@ -133,6 +144,41 @@ int main () {
     ek_srotm(4, tmp1, 1, tmp2, 1, param);
     assert(compare_arrays_floats(tmp1, result_array, 4));
     assert(compare_arrays_floats(tmp2, control_array, 4));
+
+    float A[] = {
+        1.0, 2.0, 3.0,
+        4.0, 5.0, 6.0
+    };
+
+    float B[] = {
+        7.0, 8.0,
+        9.0, 10.0,
+        11.0, 12.0
+    };
+
+    float C1[] = {
+        0.0, 0.0,
+        0.0, 0.0
+    };
+
+    float C2[] = {
+        0.0, 0.0,
+        0.0, 0.0
+    };
+
+    size_t m = 2;
+    size_t n = 2;
+    size_t k = 3;
+
+    float alpha = 1.0;
+    float beta = 0.0;
+
+    ek_sgemm(m, n, k, alpha, A, B, beta, C1);
+
+    puts("");
+    print_matrix(C1, m, n);
+    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C2, n);
+    assert(compare_arrays_floats(C1, C2, 4));
 
     puts("TESTS PASSED");
     return 0;

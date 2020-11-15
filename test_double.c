@@ -35,6 +35,18 @@ int compare_arrays_doubles(const double a[], const double b [], size_t n) {
     return 1;
 }
 
+void print_matrix(const double *mat, size_t n, size_t m) {
+    size_t i;
+
+    for (i = 0; i < (n * m); i++) {
+        if (((i + 1) % m) == 0) {
+            printf("%f\n", mat[i]);
+        } else {
+            printf("%f ", mat[i]);
+        }
+    }
+}
+
 int main () {
     // double precision
     const double array_1[] = {1.0, 2.0, 3.0, -4.0};
@@ -114,8 +126,43 @@ int main () {
     memcpy(tmp2, array_2, sizeof(array_2));
     cblas_drotm(4, result_array, 1, control_array, 1, param);
     ek_drotm(4, tmp1, 1, tmp2, 1, param);
-    assert(compare_arrays_floats(tmp1, result_array, 4));
-    assert(compare_arrays_floats(tmp2, control_array, 4));
+    assert(compare_arrays_doubles(tmp1, result_array, 4));
+    assert(compare_arrays_doubles(tmp2, control_array, 4));
+
+    double A[] = {
+        1.0, 2.0, 3.0,
+        4.0, 5.0, 6.0
+    };
+
+    double B[] = {
+        7.0, 8.0,
+        9.0, 10.0,
+        11.0, 12.0
+    };
+
+    double C1[] = {
+        0.0, 0.0,
+        0.0, 0.0
+    };
+
+    double C2[] = {
+        0.0, 0.0,
+        0.0, 0.0
+    };
+
+    size_t m = 2;
+    size_t n = 2;
+    size_t k = 3;
+
+    double alpha = 1.0;
+    double beta = 0.0;
+
+    ek_dgemm(m, n, k, alpha, A, B, beta, C1);
+
+    puts("");
+    print_matrix(C1, m, n);
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C2, n);
+    assert(compare_arrays_doubles(C1, C2, 4));
 
     puts("TESTS PASSED");
     return 0;

@@ -331,11 +331,80 @@ void ek_drotm(const size_t n, double *x, const size_t inc_x, double *y, const si
     }
 }
 
-// // performs one of the matrix-vector operations
-// void ek_sgbmv(const CBLAS_LAYOUT layout, const CBLAS_TRANSPOSE TransA, const int M, const int N, const int KL, const int KU, const float alpha, const float *A, const int lda, const float *X, const int incX, const float beta, float *Y, const int incY) {
-//     size_t i;
-//     #pragma omp parallel for
-//     for (i = 0; i < n; i++) {
-//         y[i * inc_y] = x[i * inc_x];
-//     }
-// }
+// Level 3 - single precision
+
+// computes a matrix-matrix product 
+void ek_sgemm(
+    const size_t M,
+    const size_t N,
+    const size_t K,
+    float alpha,
+    float *A,
+    float *B,
+    float beta,
+    float *C
+) {
+    size_t i = 0;
+    size_t a_m = K;
+    size_t b_m = N;
+    size_t c_n = M;
+    size_t c_m = N;
+
+    /* initialize C to array of zeros */
+    #pragma omp parallel for
+    for (i = 0; i < c_n * c_m; i++) {
+        C[i] = 0.0;
+    }
+
+    #pragma omp parallel for
+    for (i = 0; i < M; i++) {
+        size_t j = 0;
+        for (j = 0; j < N; j++) {
+            size_t k = 0;
+            for (k = 0; k < K; k++) {
+                C[i * c_m + j] += alpha * A[i * a_m + k] * B[k * b_m + j];
+                C[i * c_m + j] += beta * C[i * c_m + j];
+            }
+        }
+    }
+}
+
+
+// Level 3 - double precision
+
+// computes a matrix-matrix product 
+void ek_dgemm(
+    const size_t M,
+    const size_t N,
+    const size_t K,
+    double alpha,
+    double *A,
+    double *B,
+    double beta,
+    double *C
+) {
+    size_t i = 0;
+    size_t a_m = K;
+    size_t b_m = N;
+    size_t c_n = M;
+    size_t c_m = N;
+
+    /* initialize C to array of zeros */
+    #pragma omp parallel for
+    for (i = 0; i < c_n * c_m; i++) {
+        C[i] = 0.0;
+    }
+
+    #pragma omp parallel for
+    for (i = 0; i < M; i++) {
+        size_t j = 0;
+        for (j = 0; j < N; j++) {
+            size_t k = 0;
+            for (k = 0; k < K; k++) {
+                C[i * c_m + j] += alpha * A[i * a_m + k] * B[k * b_m + j];
+                C[i * c_m + j] += beta * C[i * c_m + j];
+            }
+        }
+    }
+}
+
