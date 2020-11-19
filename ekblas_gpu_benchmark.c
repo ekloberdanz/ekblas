@@ -1,4 +1,3 @@
-#include <cblas.h>
 #include <assert.h>
 #include <math.h>
 #include <string.h>
@@ -24,7 +23,7 @@
     } while (0)
 
 
-#define MICROTIMEIT(stmt, time_buffer)                                        \
+#define MICROTIMEIT(stmt, time_buffer)                                             \
     do {                                                                      \
         struct timeval _ksm_start, _ksm_finish;                               \
         gettimeofday(&_ksm_start, NULL);                                      \
@@ -70,18 +69,18 @@ int compare_arrays_doubles(const double a[], const double b [], size_t n) {
 void print_array_single(const float a[], size_t n) {
     size_t i;
     for (i = 0; i < n; i++) {
-        printf("%f, ", a[i]);
+        printf("%ld, ", a[i]);
     }
 }
 
-void print_matrix(const double *mat, size_t n, size_t m) {
+void print_matrix(const float *mat, size_t n, size_t m) {
     size_t i;
 
     for (i = 0; i < (n * m); i++) {
         if (((i + 1) % m) == 0) {
-            printf("%f\n", mat[i]);
+            printf("%ld\n", mat[i]);
         } else {
-            printf("%f ", mat[i]);
+            printf("%ld ", mat[i]);
         }
     }
 }
@@ -95,11 +94,9 @@ int main () {
     const size_t SIZE = M * N;
 
     // allocate memory for large arrays for benchmarking code to cblas
-    double *A = malloc(sizeof(double) * (M * K));
-    double *B = malloc(sizeof(double) * (K * N));
-    double *C = malloc(sizeof(double) * (M * N));
-    float *B_single = malloc(sizeof(double) * (K * N));
-    float *C_single = malloc(sizeof(double) * (M * N));
+    float *A = malloc(sizeof(float) * (M * K));
+    float *B = malloc(sizeof(float) * (K * N));
+    float *C = malloc(sizeof(float) * (M * N));
 
     // fill arrays with values
     size_t i;
@@ -112,195 +109,145 @@ int main () {
     #pragma omp parallel for
     for (i = 0; i < (K * N); i++) {
         B[i] = rand();
-        B_single[i] = rand();
     }
 
     #pragma omp parallel for
     for (i = 0; i < (M * N); i++) {
         C[i] = rand();
-        C_single[i] = rand();
     }
 
-    const double param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
+    const float param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
 
     // declare variables for timing routines
     size_t runtime;
 
     // open file to write results to
     FILE *fp;
-    fp = fopen("results_double.csv", "w");
+    fp = fopen("results_single.csv", "w");
 
+    // benchmark each routine implementation to cblas
 
-     // dsdot
+    // sdsdot
+   
+    fprintf(fp, "%s", "sdsdot");
     MICROTIMEIT(
-        cblas_dsdot(SIZE, C_single, 1, B_single, 1);,
+        ek_sdsdot(SIZE, 2.3, C, 1, B, 1);,
         &runtime
     );
-    printf("cblas_dsdot: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dsdot");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dsdot(SIZE, C_single, 1, B_single, 1);,
-        &runtime
-    );
-    printf("ek_dsdot: %zu micro s\n", runtime);
+    printf("ek_sdsdot: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
     
-    // ddot
+    // sdot
+    
+    fprintf(fp, "%s", "sdot");
     MICROTIMEIT(
-        cblas_ddot(SIZE, C, 1, B, 1);,
+        ek_sdot(SIZE, C, 1, B, 1);,
         &runtime
     );
-    printf("cblas_ddot: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "ddot");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_ddot(SIZE, C, 1, B, 1);,
-        &runtime
-    );
-    printf("ek_ddot: %zu micro s\n", runtime);
+    printf("ek_sdot: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dasum
+    // sasum
+   
+    fprintf(fp, "%s", "sasum");
     MICROTIMEIT(
-        cblas_dasum(SIZE, C, 1);,
+        ek_sasum(SIZE, C, 1);,
         &runtime
     );
-    printf("cblas_dasum: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dasum");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dasum(SIZE, C, 1);,
-        &runtime
-    );
-    printf("ek_dasum: %zu micro s\n", runtime);
+    printf("ek_sasum: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // daxpy
+    // saxpy
+    fprintf(fp, "%s", "saxpy");
     MICROTIMEIT(
-        cblas_daxpy(SIZE, 2.3, C, 1, B, 1);,
+        ek_saxpy(SIZE, 2.3, C, 1, B, 1);,
         &runtime
     );
-    printf("cblas_daxpy: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "daxpy");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_daxpy(SIZE, 2.3, C, 1, B, 1);,
-        &runtime
-    );
-    printf("ek_daxpy: %zu micro s\n", runtime);
+    printf("ek_saxpy: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dnrm2
+    // snrm2
+    fprintf(fp, "%s", "snrm2");
     MICROTIMEIT(
-        cblas_dnrm2(SIZE, C, 1);,
+        ek_snrm2(SIZE, C, 1);,
         &runtime
     );
-    printf("cblas_dnrm2: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dnrm2");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dnrm2(SIZE, C, 1);,
-        &runtime
-    );
-    printf("ek_dnrm2: %zu micro s\n", runtime);
+    printf("ek_snrm2: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dscal
+    // sscal
+    fprintf(fp, "%s", "sscal");
     MICROTIMEIT(
-        cblas_dscal(SIZE, 2.3, B, 1);,
+        ek_sscal(SIZE, 2.3, B, 1);,
         &runtime
     );
-    printf("cblas_dscal: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dscal");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dscal(SIZE, 2.3, B, 1);,
-        &runtime
-    );
-    printf("ek_dscal: %zu micro s\n", runtime);
+    printf("ek_sscal: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dswap
+    // sswap
+    fprintf(fp, "%s", "sswap");
     MICROTIMEIT(
-        cblas_dswap(SIZE, C, 1, B, 1);,
+        ek_sswap(SIZE, C, 1, B, 1);,
         &runtime
     );
-    printf("cblas_dswap: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dswap");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dswap(SIZE, C, 1, B, 1);,
-        &runtime
-    );
-    printf("ek_dswap: %zu micro s\n", runtime);
+    printf("ek_sswap: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dcopy
+    // scopy
+    fprintf(fp, "%s", "scopy");
     MICROTIMEIT(
-        cblas_dcopy(SIZE, C, 1, B, 1);,
+        ek_scopy(SIZE, C, 1, B, 1);,
         &runtime
     );
-    printf("cblas_dcopy: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "dcopy");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_dcopy(SIZE, C, 1, B, 1);,
-        &runtime
-    );
-    printf("ek_dcopy: %zu micro s\n", runtime);
+    printf("ek_scopy: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // drot
+    // srot
+    fprintf(fp, "%s", "srot");
     MICROTIMEIT(
-        cblas_drot(SIZE, C, 1, B, 1, 1.2, 1.3);,
+        ek_srot(SIZE, C, 1, B, 1, 1.2, 1.3);,
         &runtime
     );
-    printf("cblas_drot: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "drot");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_drot(SIZE, C, 1, B, 1, 1.2, 1.3);,
-        &runtime
-    );
-    printf("ek_drot: %zu micro s\n", runtime);
+    printf("ek_srot: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // drotm
+
+    // srotg
+    float a1, a2, b1, b2, c2, s2;
+    a1 = a2 = 15.7;
+    b1 = b2 = 4.4;
+
+    fprintf(fp, "%s", "srotg");
     MICROTIMEIT(
-        cblas_drotm(SIZE, C, 1, B, 1, param);,
+        ek_srotg(&a2, &b2, &c2, &s2);,
         &runtime
     );
-    printf("cblas_drotm: %zu micro s\n", runtime);
-    fprintf(fp, "%s", "drotm");
-    fprintf(fp, ",%zu", runtime);
-    MICROTIMEIT(
-        ek_drotm(SIZE, C, 1, B, 1, param);,
-        &runtime
-    );
-    printf("ek_drotm: %zu micro s\n", runtime);
+    printf("ek_srotg: %zu micro s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
-    // dgemm
+    // srotm
+    fprintf(fp, "%s", "srotm");
+    MICROTIMEIT(
+        ek_srotm(SIZE, C, 1, B, 1, param);,
+        &runtime
+    );
+    printf("ek_srotm: %zu micro s\n", runtime);
+    fprintf(fp, ",%ld\n", runtime);
+
+    // sgemm
     size_t m = M; // rows in A and C
     size_t n = N; // columns in B and C
     size_t k = K; // rows in B and columns in A
 
-    double alpha = 1.0;
-    double beta = 0.0;
+    float alpha = 1.0;
+    float beta = 0.0;
 
+    fprintf(fp, "%s", "sgemm");
     TIMEIT(
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C, n);,
+        ek_sgemm(m, n, k, alpha, A, B, beta, C);,
         &runtime
     );
-    printf("cblas_dgemm: %zu s\n", runtime);
-    fprintf(fp, "%s", "dgemm");
-    fprintf(fp, ",%zu", runtime);
-    TIMEIT(
-        ek_dgemm(m, n, k, alpha, A, B, beta, C);,
-        &runtime
-    );
-    printf("ek_dgemm: %zu s\n", runtime);
+    printf("ek_sgemm: %zu s\n", runtime);
     fprintf(fp, ",%ld\n", runtime);
 
     // close results file
@@ -309,12 +256,9 @@ int main () {
     puts("BENCHMARKS COMPLETE");
 
     // free memory of the arrays
-    free(C);
-    free(B);
     free(A);
-    free(B_single);
-    free(C_single);
-
+    free(B);
+    free(C);
 
     return 0;
 }

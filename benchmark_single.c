@@ -4,8 +4,38 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
+#include <sys/time.h>
 
 #include "ekblas.h"
+
+#define TIMEIT(stmt, time_buffer)                                             \
+    do {                                                                      \
+        struct timeval _ksm_start, _ksm_finish;                               \
+        gettimeofday(&_ksm_start, NULL);                                      \
+        {                                                                     \
+            stmt;                                                             \
+        }                                                                     \
+        gettimeofday(&_ksm_finish, NULL);                                     \
+        *time_buffer =                                                        \
+            (1000000 * _ksm_finish.tv_sec + _ksm_finish.tv_usec) -            \
+            (1000000 * _ksm_start.tv_sec + _ksm_start.tv_usec);               \
+        *time_buffer /= 1000000;                                              \
+    } while (0)
+
+
+#define MICROTIMEIT(stmt, time_buffer)                                        \
+    do {                                                                      \
+        struct timeval _ksm_start, _ksm_finish;                               \
+        gettimeofday(&_ksm_start, NULL);                                      \
+        {                                                                     \
+            stmt;                                                             \
+        }                                                                     \
+        gettimeofday(&_ksm_finish, NULL);                                     \
+        *time_buffer =                                                        \
+            (1000000 * _ksm_finish.tv_sec + _ksm_finish.tv_usec) -            \
+            (1000000 * _ksm_start.tv_sec + _ksm_start.tv_usec);               \
+    } while (0)
 
 int compare_floats(float a, float b) {
     const float epsilon = 0.001;
@@ -90,175 +120,185 @@ int main () {
     const float param[] = {1.0, 2.0, -3.0, -4.0, 0.3};
 
     // declare variables for timing routines
-    clock_t t_start, t_end;
-    double t_delta;
+    size_t runtime;
 
     // open file to write results to
     FILE *fp;
     fp = fopen("results_single.csv", "w");
 
     // benchmark each routine implementation to cblas
-    t_start = clock();
-    cblas_sdsdot(SIZE, 2.3, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+
+    // sdsdot
+    MICROTIMEIT(
+        cblas_sdsdot(SIZE, 2.3, C, 1, B, 1);,
+        &runtime
+    );
+    printf("cblas_sdsdot: %zu micro s\n", runtime);
     fprintf(fp, "%s", "sdsdot");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_sdsdot(SIZE, 2.3, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_sdsdot(SIZE, 2.3, C, 1, B, 1);,
+        &runtime
+    );
+    printf("ek_sdsdot: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
     
-    t_start = clock();
-    cblas_sdot(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // sdot
+    MICROTIMEIT(
+        cblas_sdot(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("cblas_sdot: %zu micro s\n", runtime);
     fprintf(fp, "%s", "sdot");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_sdot(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_sdot(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("ek_sdot: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_sasum(SIZE, C, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // sasum
+    MICROTIMEIT(
+        cblas_sasum(SIZE, C, 1);,
+        &runtime
+    );
+    printf("cblas_sasum: %zu micro s\n", runtime);
     fprintf(fp, "%s", "sasum");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_sasum(SIZE, C, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_sasum(SIZE, C, 1);,
+        &runtime
+    );
+    printf("ek_sasum: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_saxpy(SIZE, 2.3, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // saxpy
+    MICROTIMEIT(
+        cblas_saxpy(SIZE, 2.3, C, 1, B, 1);,
+        &runtime
+    );
+    printf("cblas_saxpy: %zu micro s\n", runtime);
     fprintf(fp, "%s", "saxpy");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_saxpy(SIZE, 2.3, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_saxpy(SIZE, 2.3, C, 1, B, 1);,
+        &runtime
+    );
+    printf("ek_saxpy: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_snrm2(SIZE, C, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // snrm2
+    MICROTIMEIT(
+        cblas_snrm2(SIZE, C, 1);,
+        &runtime
+    );
+    printf("cblas_snrm2: %zu micro s\n", runtime);
     fprintf(fp, "%s", "snrm2");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_snrm2(SIZE, C, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_snrm2(SIZE, C, 1);,
+        &runtime
+    );
+    printf("ek_snrm2: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_sscal(SIZE, 2.3, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // sscal
+    MICROTIMEIT(
+        cblas_sscal(SIZE, 2.3, B, 1);,
+        &runtime
+    );
+    printf("cblas_sscal: %zu micro s\n", runtime);
     fprintf(fp, "%s", "sscal");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_sscal(SIZE, 2.3, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_sscal(SIZE, 2.3, B, 1);,
+        &runtime
+    );
+    printf("ek_sscal: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_sswap(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // sswap
+    MICROTIMEIT(
+        cblas_sswap(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("cblas_sswap: %zu micro s\n", runtime);
     fprintf(fp, "%s", "sswap");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_sswap(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_sswap(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("ek_sswap: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_scopy(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // scopy
+    MICROTIMEIT(
+        cblas_scopy(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("cblas_scopy: %zu micro s\n", runtime);
     fprintf(fp, "%s", "scopy");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_scopy(SIZE, C, 1, B, 1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_scopy(SIZE, C, 1, B, 1);,
+        &runtime
+    );
+    printf("ek_scopy: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-    t_start = clock();
-    cblas_srot(SIZE, C, 1, B, 1, 1.2, 1.3);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // srot
+    MICROTIMEIT(
+        cblas_srot(SIZE, C, 1, B, 1, 1.2, 1.3);,
+        &runtime
+    );
+    printf("cblas_srot: %zu micro s\n", runtime);
     fprintf(fp, "%s", "srot");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock();
-    ek_srot(SIZE, C, 1, B, 1, 1.2, 1.3);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_srot(SIZE, C, 1, B, 1, 1.2, 1.3);,
+        &runtime
+    );
+    printf("ek_srot: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
 
+    // srotg
     float a1, a2, b1, b2, c1, c2, s1, s2;
     a1 = a2 = 15.7;
     b1 = b2 = 4.4;
 
-    t_start = clock();
-    cblas_srotg(&a1, &b1, &c1, &s1);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    MICROTIMEIT(
+        cblas_srotg(&a1, &b1, &c1, &s1);,
+        &runtime
+    );
+    printf("cblas_srotg: %zu micro s\n", runtime);
     fprintf(fp, "%s", "srotg");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock(); 
-    ek_srotg(&a2, &b2, &c2, &s2);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_srotg(&a2, &b2, &c2, &s2);,
+        &runtime
+    );
+    printf("ek_srotg: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-
-    t_start = clock();
-    cblas_srotm(SIZE, C, 1, B, 1, param);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    // srotm
+    MICROTIMEIT(
+        cblas_srotm(SIZE, C, 1, B, 1, param);,
+        &runtime
+    );
+    printf("cblas_srotm: %zu micro s\n", runtime);
     fprintf(fp, "%s", "srotm");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock(); 
-    ek_srotm(SIZE, C, 1, B, 1, param);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    MICROTIMEIT(
+        ek_srotm(SIZE, C, 1, B, 1, param);,
+        &runtime
+    );
+    printf("ek_srotm: %zu micro s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
-
+    // sgemm
     size_t m = M; // rows in A and C
     size_t n = N; // columns in B and C
     size_t k = K; // rows in B and columns in A
@@ -266,19 +306,19 @@ int main () {
     float alpha = 1.0;
     float beta = 0.0;
 
-    t_start = clock();
-    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C, n);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time control: %f\n", t_delta);
+    TIMEIT(
+        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A, k, B, n, beta, C, n);,
+        &runtime
+    );
+    printf("cblas_sgemm: %zu s\n", runtime);
     fprintf(fp, "%s", "sgemm");
-    fprintf(fp, ",%f", t_delta);
-    t_start = clock(); 
-    ek_sgemm(m, n, k, alpha, A, B, beta, C);
-    t_end = clock() - t_start;
-    t_delta = ((double)t_end)/CLOCKS_PER_SEC;
-    printf("time result: %f\n", t_delta);
-    fprintf(fp, ",%f\n", t_delta);
+    fprintf(fp, ",%zu", runtime);
+    TIMEIT(
+        ek_sgemm(m, n, k, alpha, A, B, beta, C);,
+        &runtime
+    );
+    printf("ek_sgemm: %zu s\n", runtime);
+    fprintf(fp, ",%f\n", runtime);
 
     // close results file
     fclose(fp);

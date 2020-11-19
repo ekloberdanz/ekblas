@@ -10,6 +10,8 @@ float ek_sdsdot(const size_t n, const float alpha, const float *x, const size_t 
     size_t i;
     double acc = 0.0;
     float result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:acc)
     for (i = 0; i < n; i++) {
         acc += x[i * inc_x] * y[i * inc_y];
@@ -23,6 +25,8 @@ float ek_sdsdot(const size_t n, const float alpha, const float *x, const size_t 
 float ek_sdot(const size_t n, const float *x, const size_t inc_x, const float *y, const size_t inc_y) {
     size_t i;
     float result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += x[i * inc_x] * y[i * inc_y];
@@ -34,6 +38,8 @@ float ek_sdot(const size_t n, const float *x, const size_t inc_x, const float *y
 float ek_sasum(const size_t n, const float *x, const size_t inc_x) {
     size_t i;
     float result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += fabsf(x[i * inc_x]);
@@ -44,6 +50,8 @@ float ek_sasum(const size_t n, const float *x, const size_t inc_x) {
 // constant times a vector plus a vector
 void ek_saxpy(const size_t n, const float alpha, const float *x, const size_t inc_x, float *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         y[i * inc_y] = alpha * x[i * inc_x] + y[i * inc_y];
@@ -54,6 +62,8 @@ void ek_saxpy(const size_t n, const float alpha, const float *x, const size_t in
 float ek_snrm2(const size_t n, const float *x, const size_t inc_x) {
     size_t i;
     float result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += x[i * inc_x] * x[i * inc_x];
@@ -64,6 +74,8 @@ float ek_snrm2(const size_t n, const float *x, const size_t inc_x) {
 // scales a vector by a constant
 void ek_sscal(const size_t n, const float alpha, float *x, const size_t inc_x) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         x[i * inc_x] = alpha * x[i * inc_x];
@@ -73,6 +85,8 @@ void ek_sscal(const size_t n, const float alpha, float *x, const size_t inc_x) {
 // interchanges two vectors
 void ek_sswap(const size_t n, float *x, const size_t inc_x, float *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         float tmp = x[i * inc_x];
@@ -84,6 +98,8 @@ void ek_sswap(const size_t n, float *x, const size_t inc_x, float *y, const size
 // copies a vector, x, to a vector, y
 void ek_scopy(const size_t n, const float *x, const size_t inc_x, float *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         y[i * inc_y] = x[i * inc_x];
@@ -93,6 +109,8 @@ void ek_scopy(const size_t n, const float *x, const size_t inc_x, float *y, cons
 // performs rotation of points in the plane
 void ek_srot(const size_t n, float *x, const size_t inc_x, float *y, const size_t inc_y, const float c, const float s) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         float tmp = x[i * inc_x];
@@ -188,6 +206,8 @@ void ek_srotm(const size_t n, float *x, const size_t inc_x, float *y, const size
         H[2] = 0.0;
         H[3] = 1.0;
     }
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         float tmp = x[i * inc_x];
@@ -204,6 +224,8 @@ double ek_dsdot(const size_t n, const float *x, const size_t inc_x, const float 
     size_t i;
     double acc = 0.0;
     float result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:acc)
     for (i = 0; i < n; i++) {
         acc += x[i * inc_x] * y[i * inc_y];
@@ -216,6 +238,8 @@ double ek_dsdot(const size_t n, const float *x, const size_t inc_x, const float 
 double ek_ddot(const size_t n, const double *x, const size_t inc_x, const double *y, const size_t inc_y) {
     size_t i;
     double result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += x[i * inc_x] * y[i * inc_y];
@@ -227,6 +251,8 @@ double ek_ddot(const size_t n, const double *x, const size_t inc_x, const double
 double ek_dasum(const size_t n, const double *x, const size_t inc_x) {
     size_t i;
     double result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += fabs(x[i * inc_x]);
@@ -237,6 +263,8 @@ double ek_dasum(const size_t n, const double *x, const size_t inc_x) {
 // constant times a vector plus a vector
 void ek_daxpy(const size_t n, const double alpha, const double *x, const size_t inc_x, double *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         y[i * inc_y] = alpha * x[i * inc_x] + y[i * inc_y];
@@ -247,6 +275,8 @@ void ek_daxpy(const size_t n, const double alpha, const double *x, const size_t 
 double ek_dnrm2(const size_t n, const double *x, const size_t inc_x) {
     size_t i;
     double result = 0.0;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for reduction(+:result)
     for (i = 0; i < n; i++) {
         result += x[i * inc_x] * x[i * inc_x];
@@ -257,6 +287,8 @@ double ek_dnrm2(const size_t n, const double *x, const size_t inc_x) {
 // scales a vector by a constant
 void ek_dscal(const size_t n, const double alpha, double *x, const size_t inc_x) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         x[i * inc_x] = alpha * x[i * inc_x];
@@ -266,6 +298,8 @@ void ek_dscal(const size_t n, const double alpha, double *x, const size_t inc_x)
 // interchanges two vectors
 void ek_dswap(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         double tmp = x[i * inc_x];
@@ -277,6 +311,8 @@ void ek_dswap(const size_t n, double *x, const size_t inc_x, double *y, const si
 // copies a vector, x, to a vector, y
 void ek_dcopy(const size_t n, const double *x, const size_t inc_x, double *y, const size_t inc_y) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         y[i * inc_y] = x[i * inc_x];
@@ -286,6 +322,8 @@ void ek_dcopy(const size_t n, const double *x, const size_t inc_x, double *y, co
 // applies a plane rotation
 void ek_drot(const size_t n, double *x, const size_t inc_x, double *y, const size_t inc_y, const double c, const double s) {
     size_t i;
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         double tmp = x[i * inc_x];
@@ -323,6 +361,8 @@ void ek_drotm(const size_t n, double *x, const size_t inc_x, double *y, const si
         H[2] = 0.0;
         H[3] = 1.0;
     }
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < n; i++) {
         double tmp = x[i * inc_x];
@@ -351,11 +391,14 @@ void ek_sgemm(
     size_t c_m = N;
 
     /* initialize C to array of zeros */
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < c_n * c_m; i++) {
         C[i] = 0.0;
     }
-
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < M; i++) {
         size_t j = 0;
@@ -390,11 +433,14 @@ void ek_dgemm(
     size_t c_m = N;
 
     /* initialize C to array of zeros */
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < c_n * c_m; i++) {
         C[i] = 0.0;
     }
-
+    /* offload to GPU*/
+    /* #pragma omp target*/
     #pragma omp parallel for
     for (i = 0; i < M; i++) {
         size_t j = 0;

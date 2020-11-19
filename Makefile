@@ -1,11 +1,11 @@
 CC=gcc
 # Compile without openmp
-#CFLAGS=-Wall -Wextra -std=gnu99 -lm -Ofast -march=native -mtune=native
+CFLAGS=-Wall -Wextra -std=gnu99 -Ofast -march=native -mtune=native
 # Compile with openmp
-CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -lm -Ofast -march=native -mtune=native
+#CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -Ofast -march=native -mtune=native
 # Compile with openmp gpu
-#CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -foffload=nvptx-none -lm -Ofast -march=native -mtune=native
-LDFLAGS=-lopenblas
+#CFLAGS=-Wall -Wextra -std=gnu99 -fopenmp -foffload=nvptx-none -Ofast -march=native -mtune=native
+LDFLAGS=-lopenblas -lm
 
 .PHONY: all
 all: test_single test_double benchmark_single benchmark_double
